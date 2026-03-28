@@ -15,8 +15,6 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - paperclip-net
 
   server:
     build: .
@@ -38,13 +36,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - paperclip-net
 
 volumes:
   pgdata:
   paperclip-data:
-
-networks:
-  paperclip-net:
-    driver: bridge
