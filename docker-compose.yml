@@ -31,8 +31,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "sleep 3 && node server/dist/index.js"
-
+    command: >
+      sh -c "sleep 5 && node server/dist/index.js || (echo 'App crashed, keeping container alive for debugging...' && tail -f /dev/null)"
+    restart: unless-stopped
 volumes:
   pgdata:
   paperclip-data:
