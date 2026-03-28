@@ -1,15 +1,16 @@
 services:
   db:
     image: postgres:17-alpine
+    container_name: paperclip-db # Explicit naming helps Dokploy DNS
     environment:
       POSTGRES_USER: paperclip
       POSTGRES_PASSWORD: paperclip
       POSTGRES_DB: paperclip
-    healthcheck:
+healthcheck:
       test: ["CMD-SHELL", "pg_isready -U paperclip -d paperclip"]
-      interval: 2s
+      interval: 5s
       timeout: 5s
-      retries: 30
+      retries: 5
     ports:
       - "5432:5432"
     volumes:
@@ -19,10 +20,13 @@ services:
 
   server:
     build: .
+    container_name: paperclip-server
+    # OVERRIDE the start to wait for DNS/Network to settle
+    command: sh -c "sleep 5 && node server/dist/index.js"
     ports:
       - "3100:3100"
     environment:
-      DATABASE_URL: "postgres://paperclip:paperclip@db:5432/paperclip"
+      DATABASE_URL: postgres://paperclip:paperclip@db:5432/paperclip
       PORT: "3100"
       SERVE_UI: "true"
       PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
