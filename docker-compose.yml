@@ -14,13 +14,15 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - paperclip-net
 
   server:
     build: .
     ports:
       - "3100:3100"
     environment:
-      DATABASE_URL: postgres://paperclip:paperclip@db:5432/paperclip
+      DATABASE_URL: "postgres://paperclip:paperclip@db:5432/paperclip"
       PORT: "3100"
       SERVE_UI: "true"
       PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
@@ -32,7 +34,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - paperclip-net
 
 volumes:
   pgdata:
   paperclip-data:
+
+networks:
+  paperclip-net:
+    driver: bridge
