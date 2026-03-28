@@ -16,24 +16,26 @@ services:
 
   server:
     build: .
-    ports:
-      - "3100:3100"
+    working_dir: /app
     environment:
       DATABASE_URL: postgres://paperclip:paperclip@db:5432/paperclip
-      PORT: "3100"
+      PORT: 3100
       SERVE_UI: "true"
       PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
       PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
       PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL:-http://localhost:3100}"
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET}"
+      # This helps Node resolve the workspace modules
+      NODE_OPTIONS: "--extensionless-loader" 
     volumes:
+      # ONLY mount the specific data folder, never the whole /app
       - paperclip-data:/app/data
     depends_on:
       db:
         condition: service_healthy
     command: >
-      sh -c "sleep 5 && node server/dist/index.js || (echo 'App crashed, keeping container alive for debugging...' && tail -f /dev/null)"
-    restart: unless-stopped
+      sh -c "node server/dist/index.js || (echo 'Still failing. Checking file existence...' && ls /app/packages/db/src/client.js && tail -f /dev/null)"
+      
 volumes:
   pgdata:
   paperclip-data:
