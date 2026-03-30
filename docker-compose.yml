@@ -34,7 +34,7 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "node server/dist/index.js || (echo 'Still failing. Checking file existence...' && ls /app/packages/db/src/client.js && tail -f /dev/null)"
+      sh -c "node server/dist/index.js || (echo 'Still failing. Checking file existence...' && tail -f /dev/null)"
       
 volumes:
   pgdata:
